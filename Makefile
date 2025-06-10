@@ -5,6 +5,10 @@ CMAKE := cmake
 BUILD_DIR := build
 BENCHMARK_DIR := benchmark_results
 
+# Profile variables
+KERNEL ?= 0
+PREFIX ?=
+
 all: build
 
 build:
