@@ -5,6 +5,30 @@
 - There are **four** warp schedulers per multiprocessor.
 - **Global memory coalescing**. It’s the most important thing to keep in mind when optimizing a kernel’s GMEM memory accesses toward achieving the peak bandwidth.
 
+## Grid and Block
+
+<div align="center">
+<img src="./assets/CUDA_thread_hierarchy.png" alt="Grid and Block" width="800"/>
+</div>
+
+syntax for grid and block:
+```c++
+dim3 grid(blockIdx.x, blockIdx.y, blockIdx.z);
+dim3 block(threadIdx.x, threadIdx.y, threadIdx.z);
+```
+launch kernel:
+```c++
+kernel<<<grid, block>>>(args);
+```
+
+In reality, `blockIdx.x` controls the row id of the block, `blockIdx.y` controls the column id of the block. When you launch the kernel to compute the matrix with dimension of `M*N`, you may set the `blockIdx.x` to `(M+BLOCKSIZE-1)/BLOCKSIZE` and `blockIdx.y` to `(N+BLOCKSIZE-1)/BLOCKSIZE`.
+
+So in your code, when you want to get the row id of the block, you can use `blockIdx.x * BLOCKSIZE` and the column id of the block, you can use `blockIdx.y * BLOCKSIZE`.
+In this case, the `blockIdx.x` and `blockIdx.y` in the figure seems a little bit confusing.
+
+
+Of course, you can change the meaning of `blockIdx.x` and `blockIdx.y` to control the column id and row id of the block respectively. But you need to take care of your code when you do this.
+
 
 ## Global Memory Coalescing
 In reality, the GPU supports 32B, 64B and 128B memory accesses. So, if each thread is loading a 32bit float from global memory, the warp scheduler (probably the MIO) can coalesce this 32*4B=128B load into a single transaction. 
@@ -35,7 +59,6 @@ Looking at the hierarchy of GPU memory:
 - Bandwidth of shared memory is about 12TB/s, compared to 750GB/s for global memory. For Volta.
 
 
-## Shared Memory Coalescing
 
 
 
